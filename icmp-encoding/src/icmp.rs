@@ -1,5 +1,4 @@
 use internet_checksum::{
-    checksum,
     Checksum,
 };
 use nom::{
@@ -59,7 +58,12 @@ impl IcmpV4Header {
         }
 
         // Checksum
-        let calculated_checksum = checksum(buffer.full());
+        let mut checksum = Checksum::new();
+        checksum.add_bytes(&buffer.full()[0..2]);
+        checksum.add_bytes(&[0, 0]);
+        checksum.add_bytes(&buffer.full()[4..]);
+
+        let calculated_checksum = checksum.checksum();
 
         // Insert Checksum
         {

@@ -13,6 +13,7 @@ use socket2::{
 use std::{
     io,
     net::{
+        Ipv4Addr,
         SocketAddr,
         SocketAddrV4,
     },
@@ -23,13 +24,13 @@ use std::{
 };
 use tokio::io::PollEvented;
 
-pub struct ICMPV4Socket {
+pub struct IcmpV4Socket {
     io: PollEvented<evented_socket::Socket>,
 }
 
-impl ICMPV4Socket {
+impl IcmpV4Socket {
     pub fn new() -> io::Result<Self> {
-        ICMPV4Socket::from_metal_socket(evented_socket::Socket::new(
+        IcmpV4Socket::from_metal_socket(evented_socket::Socket::new(
             Domain::ipv4(),
             Type::dgram(),
             Protocol::icmpv4(),
@@ -38,11 +39,12 @@ impl ICMPV4Socket {
 
     fn from_metal_socket(socket: evented_socket::Socket) -> io::Result<Self> {
         let io = PollEvented::new(socket)?;
-        Ok(ICMPV4Socket { io })
+        Ok(IcmpV4Socket { io })
     }
 
-    pub async fn send_to(&self, buf: &[u8], target: SocketAddrV4) -> io::Result<usize> {
-        poll_fn(|cx| self.poll_send_to(cx, buf, &SockAddr::from(target))).await
+    pub async fn send_to(&self, buf: &[u8], target: Ipv4Addr) -> io::Result<usize> {
+        poll_fn(|cx| self.poll_send_to(cx, buf, &SockAddr::from(SocketAddrV4::new(target, 0))))
+            .await
     }
 
     fn poll_send_to(
@@ -62,12 +64,12 @@ impl ICMPV4Socket {
         }
     }
 
-    pub async fn recv_from(&self, buf: &mut [u8]) -> io::Result<(usize, SocketAddrV4)> {
+    pub async fn recv_from(&self, buf: &mut [u8]) -> io::Result<(usize, Ipv4Addr)> {
         let (bytes_written, from_addr) = poll_fn(|cx| self.poll_recv_from(cx, buf)).await?;
 
         Ok((
             bytes_written,
-            from_addr.as_std().unwrap().into_v4().unwrap(),
+            *from_addr.as_std().unwrap().into_v4().unwrap().ip(),
         ))
     }
 

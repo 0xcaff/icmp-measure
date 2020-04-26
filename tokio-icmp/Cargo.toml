@@ -14,3 +14,4 @@ futures = "0.3.4"
 
 [dev-dependencies]
 tokio = { version = "0.2.19", features = ["io-driver", "macros", "rt-core"] }
+icmp-encoding = { path = "../icmp-encoding" }
