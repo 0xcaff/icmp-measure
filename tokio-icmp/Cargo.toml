@@ -1,0 +1,16 @@
+[package]
+name = "tokio-icmp"
+version = "0.1.0"
+authors = ["Martin Charles <martincharles07@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+socket2 = "0.3.12"
+tokio = { version = "0.2.19", features = ["io-driver"] }
+mio = "0.6.21"
+futures = "0.3.4"
+
+[dev-dependencies]
+tokio = { version = "0.2.19", features = ["io-driver", "macros", "rt-core"] }
