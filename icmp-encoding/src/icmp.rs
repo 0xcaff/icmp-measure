@@ -1,6 +1,4 @@
-use internet_checksum::{
-    Checksum,
-};
+use internet_checksum::Checksum;
 use nom::{
     combinator::verify,
     error::ErrorKind,
