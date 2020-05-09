@@ -9,7 +9,6 @@ use icmp_encoding::{
 use std::{
     net::Ipv4Addr,
     sync::Arc,
-    thread,
     time::{
         Duration,
         Instant,
@@ -66,13 +65,13 @@ async fn ping_pong_many() {
     // let dest_addr = Ipv4Addr::new(8, 8, 8, 8);
 
     // MTU or size of the largest packet we can send without fragmentation.
-    let packet_size = 1500;
+    const PACKET_SIZE: usize = 1500;
 
     let socket = Arc::new(IcmpV4Socket::new().unwrap());
     let recv_socket = socket.clone();
 
     let future = tokio::task::spawn((|| async move {
-        let mut recv_buffer = &mut [0u8; packet_size][..];
+        let mut recv_buffer = &mut [0u8; PACKET_SIZE][..];
         let start = Instant::now();
 
         let mut count = 0u32;
@@ -98,7 +97,7 @@ async fn ping_pong_many() {
         println!("{:?}", (count, Instant::now().duration_since(start)));
     })());
 
-    let mut raw_send_buffer = &mut [1u8; packet_size - 20][..];
+    let mut raw_send_buffer = &mut [1u8; PACKET_SIZE - 20][..];
     let mut send_buffer = WritableIcmpPacket::new(&mut raw_send_buffer).unwrap();
 
     let ping_message = IcmpV4Header {
