@@ -24,6 +24,20 @@ use std::{
 };
 use tokio::io::PollEvented;
 
+/// Exposes a futures compatible API for sending and receiving ICMPv4 ping
+/// messages.
+///
+/// Polling multiple send futures or multiple receive futures at the same time
+/// is undefined behavior.
+///
+/// From `PollEvented` docs:
+///
+/// While `PollEvented` is `Sync` (if the underlying I/O type is `Sync`), the
+/// caller must ensure that there are at most two tasks that use a `PollEvented`
+/// instance concurrently. One for reading and one for writing. While violating
+/// this requirement is "safe" from a Rust memory model point of view, it will
+/// result in unexpected behavior in the form of lost notifications and tasks
+/// hanging.
 pub struct IcmpV4Socket {
     io: PollEvented<evented_socket::Socket>,
 }
